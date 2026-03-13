@@ -9,6 +9,7 @@ setup.py
 ../../build/locomotion/locomotion.egg-info/top_level.txt
 ../../build/locomotion/locomotion.egg-info/zip-safe
 locomotion/__init__.py
+locomotion/motor_command.py
 locomotion/rc_control.py
 resource/locomotion
 test/test_copyright.py

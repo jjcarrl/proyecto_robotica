@@ -1,23 +1,9 @@
 #!/usr/bin/env python3
 
-import os
-os.environ["GPIOZERO_PIN_FACTORY"] = "lgpio"
-
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
-from gpiozero import Motor
-
-
-# =========================
-# Pines GPIO (BCM)
-# =========================
-PIN_FORWARD_L = 17   # IN1
-PIN_BACKWARD_L = 27  # IN2
-
-PIN_FORWARD_R = 5    # IN3
-PIN_BACKWARD_R = 6   # IN4
 
 
 class RCControlNode(Node):
@@ -40,22 +26,8 @@ class RCControlNode(Node):
         self.latest_joy_ = Joy()
         self.timer_ = self.create_timer(0.02, self.main_loop)  # 50 Hz
 
-        # Motores
-        self.motor_l = Motor(
-            forward=PIN_FORWARD_L,
-            backward=PIN_BACKWARD_L,
-            pwm=True
-        )
-
-        self.motor_r = Motor(
-            forward=PIN_FORWARD_R,
-            backward=PIN_BACKWARD_R,
-            pwm=True
-        )
-
         self.get_logger().info("Nodo rc_control_node iniciado.")
-        self.get_logger().info("Motor izquierdo: GPIO 17/27")
-        self.get_logger().info("Motor derecho: GPIO 5/6")
+        self.get_logger().info("Publicando Twist en /motor_vel")
 
     def gamepad_callback(self, msg: Joy):
         self.latest_joy_ = msg
@@ -72,9 +44,12 @@ class RCControlNode(Node):
         return value
 
     def main_loop(self):
+        vel_msg = Twist()
+
         if len(self.latest_joy_.axes) < 6:
-            self.motor_l.stop()
-            self.motor_r.stop()
+            vel_msg.linear.x = 0.0
+            vel_msg.angular.z = 0.0
+            self.mov_publisher.publish(vel_msg)
             return
 
         # Gatillo derecho: adelante
@@ -85,37 +60,18 @@ class RCControlNode(Node):
         backward = self.latest_joy_.axes[2]
         backward = self.linear_remap(backward, a=1.0, b=-1.0, c=0.0, d=1.0)
 
-        # Stick izquierdo horizontal: giro
+        # Stick derecho horizontal: giro
         turn = self.latest_joy_.axes[0]
         turn = self.apply_deadzone(turn, deadzone=0.05)
 
-        # Velocidad base
+        # Velocidad lineal
         speed = forward - backward
         speed = self.apply_deadzone(speed, deadzone=0.05)
         speed = self.clamp(speed)
 
-        # Mezcla diferencial
-        turn_gain = 0.7
-        left_cmd = speed + turn_gain * turn
-        right_cmd = speed - turn_gain * turn
-
-        left_cmd = self.clamp(left_cmd)
-        right_cmd = self.clamp(right_cmd)
-
-        # Mandar a motores
-        self.motor_l.value = left_cmd
-        self.motor_r.value = right_cmd
-
-        # Publicar Twist
-        vel_msg = Twist()
         vel_msg.linear.x = float(speed)
         vel_msg.angular.z = float(turn)
         self.mov_publisher.publish(vel_msg)
-
-    def destroy_node(self):
-        self.motor_l.stop()
-        self.motor_r.stop()
-        super().destroy_node()
 
 
 def main(args=None):
@@ -127,8 +83,6 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        node.motor_l.stop()
-        node.motor_r.stop()
         node.destroy_node()
         rclpy.shutdown()
 

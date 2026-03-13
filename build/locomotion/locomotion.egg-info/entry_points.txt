@@ -1,2 +1,3 @@
 [console_scripts]
+motor_com = locomotion.motor_command:main
 rc_control = locomotion.rc_control:main

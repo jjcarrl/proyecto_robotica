@@ -1,0 +1,16 @@
+LICENSE
+package.xml
+setup.cfg
+setup.py
+../../build/motor_command/motor_command.egg-info/PKG-INFO
+../../build/motor_command/motor_command.egg-info/SOURCES.txt
+../../build/motor_command/motor_command.egg-info/dependency_links.txt
+../../build/motor_command/motor_command.egg-info/requires.txt
+../../build/motor_command/motor_command.egg-info/top_level.txt
+../../build/motor_command/motor_command.egg-info/zip-safe
+motor_command/__init__.py
+motor_command/motor_command.py
+resource/motor_command
+test/test_copyright.py
+test/test_flake8.py
+test/test_pep257.py

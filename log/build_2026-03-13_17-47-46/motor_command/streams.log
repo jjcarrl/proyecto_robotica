@@ -1,0 +1,36 @@
+[1.892s] Invoking command in '/home/robotica/proyecto_robotica/src/motor_command': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/robotica/proyecto_robotica/build/motor_command/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/robotica/proyecto_robotica/install/motor_command/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/motor_command build --build-base /home/robotica/proyecto_robotica/build/motor_command/build install --record /home/robotica/proyecto_robotica/build/motor_command/install.log --single-version-externally-managed install_data
+[2.273s] running egg_info
+[2.273s] creating ../../build/motor_command/motor_command.egg-info
+[2.298s] writing ../../build/motor_command/motor_command.egg-info/PKG-INFO
+[2.298s] writing dependency_links to ../../build/motor_command/motor_command.egg-info/dependency_links.txt
+[2.299s] writing requirements to ../../build/motor_command/motor_command.egg-info/requires.txt
+[2.299s] writing top-level names to ../../build/motor_command/motor_command.egg-info/top_level.txt
+[2.299s] writing manifest file '../../build/motor_command/motor_command.egg-info/SOURCES.txt'
+[2.353s] reading manifest file '../../build/motor_command/motor_command.egg-info/SOURCES.txt'
+[2.353s] adding license file 'LICENSE'
+[2.354s] writing manifest file '../../build/motor_command/motor_command.egg-info/SOURCES.txt'
+[2.354s] running build
+[2.355s] running build_py
+[2.355s] creating /home/robotica/proyecto_robotica/build/motor_command/build
+[2.355s] creating /home/robotica/proyecto_robotica/build/motor_command/build/lib
+[2.355s] creating /home/robotica/proyecto_robotica/build/motor_command/build/lib/motor_command
+[2.355s] copying motor_command/motor_command.py -> /home/robotica/proyecto_robotica/build/motor_command/build/lib/motor_command
+[2.356s] copying motor_command/__init__.py -> /home/robotica/proyecto_robotica/build/motor_command/build/lib/motor_command
+[2.356s] running install
+[2.365s] running install_lib
+[2.391s] creating /home/robotica/proyecto_robotica/install/motor_command/lib/python3.12/site-packages/motor_command
+[2.392s] copying /home/robotica/proyecto_robotica/build/motor_command/build/lib/motor_command/motor_command.py -> /home/robotica/proyecto_robotica/install/motor_command/lib/python3.12/site-packages/motor_command
+[2.392s] copying /home/robotica/proyecto_robotica/build/motor_command/build/lib/motor_command/__init__.py -> /home/robotica/proyecto_robotica/install/motor_command/lib/python3.12/site-packages/motor_command
+[2.393s] byte-compiling /home/robotica/proyecto_robotica/install/motor_command/lib/python3.12/site-packages/motor_command/motor_command.py to motor_command.cpython-312.pyc
+[2.394s] byte-compiling /home/robotica/proyecto_robotica/install/motor_command/lib/python3.12/site-packages/motor_command/__init__.py to __init__.cpython-312.pyc
+[2.394s] running install_data
+[2.395s] creating /home/robotica/proyecto_robotica/install/motor_command/share/ament_index
+[2.395s] creating /home/robotica/proyecto_robotica/install/motor_command/share/ament_index/resource_index
+[2.395s] creating /home/robotica/proyecto_robotica/install/motor_command/share/ament_index/resource_index/packages
+[2.395s] copying resource/motor_command -> /home/robotica/proyecto_robotica/install/motor_command/share/ament_index/resource_index/packages
+[2.395s] copying package.xml -> /home/robotica/proyecto_robotica/install/motor_command/share/motor_command
+[2.395s] running install_egg_info
+[2.424s] Copying ../../build/motor_command/motor_command.egg-info to /home/robotica/proyecto_robotica/install/motor_command/lib/python3.12/site-packages/motor_command-0.0.0-py3.12.egg-info
+[2.425s] running install_scripts
+[2.612s] writing list of installed files to '/home/robotica/proyecto_robotica/build/motor_command/install.log'
+[2.753s] Invoked command in '/home/robotica/proyecto_robotica/src/motor_command' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/robotica/proyecto_robotica/build/motor_command/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/robotica/proyecto_robotica/install/motor_command/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/motor_command build --build-base /home/robotica/proyecto_robotica/build/motor_command/build install --record /home/robotica/proyecto_robotica/build/motor_command/install.log --single-version-externally-managed install_data
