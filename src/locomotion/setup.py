@@ -25,7 +25,8 @@ setup(
     entry_points={
         'console_scripts': [
             'rc_control=locomotion.rc_control:main',
-            'motor_com=locomotion.motor_command:main'
+            'motor_com=locomotion.motor_command:main',
+            'graphical_odom=locomotion.trajectory:main',
         ],
     },
 )

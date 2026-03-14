@@ -12,11 +12,11 @@ from gpiozero import Motor
 # =========================
 # Pines GPIO (BCM)
 # =========================
-PIN_FORWARD_L = 17   # IN1
-PIN_BACKWARD_L = 27  # IN2
+PIN_FORWARD_L = 5   # IN1 5
+PIN_BACKWARD_L = 6  # IN2 6
 
-PIN_FORWARD_R = 5    # IN3
-PIN_BACKWARD_R = 6   # IN4
+PIN_FORWARD_R = 17    # IN3 17
+PIN_BACKWARD_R = 27   # IN4 27
 
 
 class MotorCommand(Node):
@@ -47,8 +47,8 @@ class MotorCommand(Node):
 
         self.get_logger().info("Nodo motor_command iniciado.")
         self.get_logger().info("Suscrito a /motor_vel")
-        self.get_logger().info("Motor izquierdo: GPIO 17/27")
-        self.get_logger().info("Motor derecho: GPIO 5/6")
+        self.get_logger().info("Motor izquierdo: GPIO 5/6")
+        self.get_logger().info("Motor derecho: GPIO 17/27")
 
     def cmd_callback(self, msg: Twist):
         self.latest_cmd_ = msg
@@ -66,8 +66,8 @@ class MotorCommand(Node):
         # Igual que antes
         turn_gain = 0.7
 
-        left_cmd = speed + turn_gain * turn
-        right_cmd = speed - turn_gain * turn
+        left_cmd = speed - turn_gain * turn
+        right_cmd = speed + turn_gain * turn
 
         left_cmd = self.clamp(left_cmd)
         right_cmd = self.clamp(right_cmd)
