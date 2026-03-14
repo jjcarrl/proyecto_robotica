@@ -60,9 +60,6 @@ class MotorCommand(Node):
         speed = self.latest_cmd_.linear.x
         turn = self.latest_cmd_.angular.z
 
-        speed = self.clamp(speed)
-        turn = self.clamp(turn)
-
         # Igual que antes
         turn_gain = 0.7
 

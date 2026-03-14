@@ -1,0 +1,22 @@
+[1.545s] Invoking command in '/home/robotica/proyecto_robotica/src/sensors': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/robotica/proyecto_robotica/build/sensors/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/robotica/proyecto_robotica/install/sensors/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/sensors build --build-base /home/robotica/proyecto_robotica/build/sensors/build install --record /home/robotica/proyecto_robotica/build/sensors/install.log --single-version-externally-managed install_data
+[1.926s] running egg_info
+[1.952s] writing ../../build/sensors/sensors.egg-info/PKG-INFO
+[1.952s] writing dependency_links to ../../build/sensors/sensors.egg-info/dependency_links.txt
+[1.955s] writing entry points to ../../build/sensors/sensors.egg-info/entry_points.txt
+[1.955s] writing requirements to ../../build/sensors/sensors.egg-info/requires.txt
+[1.955s] writing top-level names to ../../build/sensors/sensors.egg-info/top_level.txt
+[2.009s] reading manifest file '../../build/sensors/sensors.egg-info/SOURCES.txt'
+[2.009s] adding license file 'LICENSE'
+[2.010s] writing manifest file '../../build/sensors/sensors.egg-info/SOURCES.txt'
+[2.010s] running build
+[2.012s] running build_py
+[2.012s] running install
+[2.020s] running install_lib
+[2.048s] running install_data
+[2.048s] running install_egg_info
+[2.076s] removing '/home/robotica/proyecto_robotica/install/sensors/lib/python3.12/site-packages/sensors-0.0.0-py3.12.egg-info' (and everything under it)
+[2.077s] Copying ../../build/sensors/sensors.egg-info to /home/robotica/proyecto_robotica/install/sensors/lib/python3.12/site-packages/sensors-0.0.0-py3.12.egg-info
+[2.078s] running install_scripts
+[2.263s] Installing sensors_node script to /home/robotica/proyecto_robotica/install/sensors/lib/sensors
+[2.264s] writing list of installed files to '/home/robotica/proyecto_robotica/build/sensors/install.log'
+[2.344s] Invoked command in '/home/robotica/proyecto_robotica/src/sensors' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/robotica/proyecto_robotica/build/sensors/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/robotica/proyecto_robotica/install/sensors/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/sensors build --build-base /home/robotica/proyecto_robotica/build/sensors/build install --record /home/robotica/proyecto_robotica/build/sensors/install.log --single-version-externally-managed install_data

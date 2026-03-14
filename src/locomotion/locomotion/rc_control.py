@@ -67,7 +67,6 @@ class RCControlNode(Node):
         # Velocidad lineal
         speed = forward - backward
         speed = self.apply_deadzone(speed, deadzone=0.05)
-        speed = self.clamp(speed)
 
         vel_msg.linear.x = float(speed)
         vel_msg.angular.z = float(turn)
