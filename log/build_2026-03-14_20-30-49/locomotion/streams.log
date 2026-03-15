@@ -1,0 +1,28 @@
+[1.874s] Invoking command in '/home/robotica/proyecto_robotica/src/locomotion': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/robotica/proyecto_robotica/build/locomotion/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/robotica/proyecto_robotica/install/locomotion/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/locomotion build --build-base /home/robotica/proyecto_robotica/build/locomotion/build install --record /home/robotica/proyecto_robotica/build/locomotion/install.log --single-version-externally-managed install_data
+[2.371s] running egg_info
+[2.402s] writing ../../build/locomotion/locomotion.egg-info/PKG-INFO
+[2.403s] writing dependency_links to ../../build/locomotion/locomotion.egg-info/dependency_links.txt
+[2.403s] writing entry points to ../../build/locomotion/locomotion.egg-info/entry_points.txt
+[2.403s] writing requirements to ../../build/locomotion/locomotion.egg-info/requires.txt
+[2.405s] writing top-level names to ../../build/locomotion/locomotion.egg-info/top_level.txt
+[2.469s] reading manifest file '../../build/locomotion/locomotion.egg-info/SOURCES.txt'
+[2.470s] writing manifest file '../../build/locomotion/locomotion.egg-info/SOURCES.txt'
+[2.471s] running build
+[2.471s] running build_py
+[2.471s] copying locomotion/trajectory.py -> /home/robotica/proyecto_robotica/build/locomotion/build/lib/locomotion
+[2.472s] running install
+[2.484s] running install_lib
+[2.516s] copying /home/robotica/proyecto_robotica/build/locomotion/build/lib/locomotion/trajectory.py -> /home/robotica/proyecto_robotica/install/locomotion/lib/python3.12/site-packages/locomotion
+[2.517s] byte-compiling /home/robotica/proyecto_robotica/install/locomotion/lib/python3.12/site-packages/locomotion/trajectory.py to trajectory.cpython-312.pyc
+[2.518s] Sorry: IndentationError: unexpected indent (trajectory.py, line 145)
+[2.518s] running install_data
+[2.518s] running install_egg_info
+[2.556s] removing '/home/robotica/proyecto_robotica/install/locomotion/lib/python3.12/site-packages/locomotion-0.0.0-py3.12.egg-info' (and everything under it)
+[2.559s] Copying ../../build/locomotion/locomotion.egg-info to /home/robotica/proyecto_robotica/install/locomotion/lib/python3.12/site-packages/locomotion-0.0.0-py3.12.egg-info
+[2.561s] running install_scripts
+[2.828s] Installing graphical_odom script to /home/robotica/proyecto_robotica/install/locomotion/lib/locomotion
+[2.828s] Installing launch script to /home/robotica/proyecto_robotica/install/locomotion/lib/locomotion
+[2.828s] Installing motor_com script to /home/robotica/proyecto_robotica/install/locomotion/lib/locomotion
+[2.828s] Installing rc_control script to /home/robotica/proyecto_robotica/install/locomotion/lib/locomotion
+[2.828s] writing list of installed files to '/home/robotica/proyecto_robotica/build/locomotion/install.log'
+[2.913s] Invoked command in '/home/robotica/proyecto_robotica/src/locomotion' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/robotica/proyecto_robotica/build/locomotion/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/robotica/proyecto_robotica/install/locomotion/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/locomotion build --build-base /home/robotica/proyecto_robotica/build/locomotion/build install --record /home/robotica/proyecto_robotica/build/locomotion/install.log --single-version-externally-managed install_data
