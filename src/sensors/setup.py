@@ -25,6 +25,8 @@ setup(
     entry_points={
         'console_scripts': [
         'sensors_node = sensors.odometry:main',
+        'camera_node = sensors.camera:main',
+        'images_node = sensors.images:main',
         ],
     },
 )
