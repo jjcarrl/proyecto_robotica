@@ -2,25 +2,33 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-from picamera2 import Picamera2
 import cv2
 
 class CameraNode(Node):
+
     def __init__(self):
         super().__init__('camera_node')
         self.pub = self.create_publisher(Image, '/camera/image_raw', 10)
-        self.bridge = CvBridge()
-        self.cam = Picamera2()
-        self.cam.configure(self.cam.create_preview_configuration())
-        self.cam.start()
-        self.timer = self.create_timer(0.033, self.publish_frame)  # ~30 FPS
+        
+        self.cameraDeviceNumber=0
+        self.camera = cv2.VideoCapture(self.cameraDeviceNumber)
+
+        self.bridgeObject = CvBridge() #Imagenes de opencv a topicos ros
+
+        self.timer_period_ = 0.02
+        self.timer_ = self.create_timer(self.timer_period_,self.publish_frame)
+
+        self.img_counter_ = 0
 
     def publish_frame(self):
-        frame = self.cam.capture_array()
-        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        msg = self.bridge.cv2_to_imgmsg(frame_bgr, encoding='bgr8')
-        msg.header.stamp = self.get_clock().now().to_msg()
-        self.pub.publish(msg)
+
+        success, frame = self.camera.read()
+        frame = cv2.resize(frame, (820,640), interpolation=cv2.INTER_CUBIC)
+
+        if success:
+            ros2_img = self.bridgeObject.cv2_to_imgmsg(frame, encoding="bgr8")
+            self.pub.publish(ros2_img)
+            self.img_counter_ += 1
 
 def main():
     rclpy.init()
