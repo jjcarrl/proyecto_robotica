@@ -4,7 +4,6 @@ import rclpy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
 from rclpy.node import Node
-from gpiozero
 class rc_control_node(Node):
       def __init__(self):
          super().__init__("rc_control_node")
