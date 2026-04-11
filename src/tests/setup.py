@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'sensors'
+package_name = 'tests'
 
 setup(
     name=package_name,
@@ -16,7 +16,7 @@ setup(
     maintainer='robotica',
     maintainer_email='j.carreral@uniandes.edu.co',
     description='TODO: Package description',
-    license='Apache-2.0',
+    license='TODO: License declaration',
     extras_require={
         'test': [
             'pytest',
@@ -24,9 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-        'odometry_node = sensors.odometry:main',
-        'camera_node = sensors.camera:main',
-        'images_node = sensors.images:main',
+            "system_ident=tests.system_ident:main",
         ],
     },
 )

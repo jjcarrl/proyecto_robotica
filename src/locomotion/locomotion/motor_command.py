@@ -25,7 +25,7 @@ class MotorCommand(Node):
 
         self.cmd_subscription_ = self.create_subscription(
             Twist,
-            "/motor_vel",
+            "/motor_cmd",
             self.cmd_callback,
             10
         )
@@ -58,16 +58,19 @@ class MotorCommand(Node):
 
     def main_loop(self):
         speed = self.latest_cmd_.linear.x
-        turn = self.latest_cmd_.angular.z
+        turn  = self.latest_cmd_.angular.z
 
-        # Igual que antes
         turn_gain = 0.7
 
-        left_cmd = speed - turn_gain * turn
+        left_cmd  = speed - turn_gain * turn
         right_cmd = speed + turn_gain * turn
 
-        left_cmd = self.clamp(left_cmd)
-        right_cmd = self.clamp(right_cmd)
+        # ── Normalización: escala ambos motores juntos ──────────────
+        # Si alguno supera 1.0, divide los DOS por ese máximo.
+        # Así se preserva siempre la diferencia de velocidad (el giro).
+        max_val = max(abs(left_cmd), abs(right_cmd), 1.0)
+        left_cmd  /= max_val
+        right_cmd /= max_val
 
         self.motor_l.value = left_cmd
         self.motor_r.value = right_cmd

@@ -52,6 +52,8 @@ class RecorderPlayer(Node):
         # ── Odometría ────────────────────────────────────────────
         self.x_   = 0.0
         self.y_   = 0.0
+        self.omega_r = 0.0
+        self.omega_l = 0.0
         self.yaw_ = 0.0
         self.prev_ticks_l_ = 0
         self.prev_ticks_r_ = 0
@@ -66,13 +68,15 @@ class RecorderPlayer(Node):
 
         # ── Publicadores ─────────────────────────────────────────
         self.cmd_pub_  = self.create_publisher(Twist,    "/motor_vel", 10)
+        self.speed_pub_ = self.create_publisher(Twist,    "/omega", 10)
         self.odom_pub_ = self.create_publisher(Odometry, "/odom",      10)
 
         # ── TF broadcaster ───────────────────────────────────────
         self.tf_broadcaster_ = tf2_ros.TransformBroadcaster(self)
 
         # ── Timer principal 50 Hz ────────────────────────────────
-        self.timer_ = self.create_timer(0.02, self.main_loop)
+        self.timer_period_ = 0.02  # 20 ms -> 50 Hz
+        self.timer_ = self.create_timer(self.timer_period_, self.main_loop)
 
         # ── Hilo de teclado ──────────────────────────────────────
         self.keyboard_thread_ = threading.Thread(
@@ -223,6 +227,12 @@ class RecorderPlayer(Node):
         d_l = (ticks_l - self.prev_ticks_l_) * DIST_PER_TICK
         d_r = (ticks_r - self.prev_ticks_r_) * DIST_PER_TICK
 
+        speed_r = d_r / self.timer_period_
+        speed_l = d_l / self.timer_period_
+
+        self.omega_r = speed_r / 2 * WHEEL_DIAM_M  # rad/s
+        self.omega_l = speed_l / 2 * WHEEL_DIAM_M  # rad/s
+
         self.prev_ticks_l_ = ticks_l
         self.prev_ticks_r_ = ticks_r
 
@@ -245,6 +255,10 @@ class RecorderPlayer(Node):
         odom.pose.pose.orientation.z = math.sin(self.yaw_ / 2.0)
         odom.pose.pose.orientation.w = math.cos(self.yaw_ / 2.0)
         self.odom_pub_.publish(odom)
+        omega = Twist()
+        omega.linear.x  = self.omega_r
+        omega.angular.z = self.omega_l
+        self.speed_pub_.publish(omega)  # Publica velocidades para testear sistema de identificación)
 
         t = TransformStamped()
         t.header.stamp            = now_stamp

@@ -66,7 +66,7 @@ HTML = """
 </div>
 
 <script>
-  const socket = io('http://192.168.1.17:5000');
+  const socket = io(window.location.origin);
 
   let xs = [0], ys = [0], times = [0], yaws_deg = [0];
   let t0 = null;
