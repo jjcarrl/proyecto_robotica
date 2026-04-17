@@ -98,6 +98,7 @@ class RecorderPlayer(Node):
             "stop_play":   "Detener reproducción",
             "idle":        "Modo inactivo",
             "status":      "Ver modo actual",
+            "reset_odom":  "Resetear odometría a cero",
         }
         while rclpy.ok():
             try:
@@ -108,11 +109,11 @@ class RecorderPlayer(Node):
                     continue
                 elif cmd == "status":
                     self._print_status()
+                elif cmd == "reset_odom":
+                    self._reset_odometry()
                 elif cmd in commands:
-                    # Publica en el tópico igual que si viniera de fuera
                     msg = String()
                     msg.data = cmd
-                    # Llama directo al callback para no necesitar publisher extra
                     self.mode_callback(msg)
                 else:
                     print(f"  Comando desconocido: '{cmd}'")
@@ -133,7 +134,7 @@ class RecorderPlayer(Node):
         print(f"  Muestras grabadas: {len(self.record_data_)}")
         print(f"  Posición: x={self.x_:.3f}m  y={self.y_:.3f}m  yaw={math.degrees(self.yaw_):.1f}°")
         print(f"{'─'*40}")
-        print(f"  Comandos: record | stop_record | play | stop_play | idle | status")
+        print(f"  Comandos: record | stop_record | play | stop_play | idle | status | reset_odom")
         print(f"{'─'*40}\n")
 
     # ─────────────────────────────────────────────────────────────
@@ -201,6 +202,16 @@ class RecorderPlayer(Node):
         self.cmd_pub_.publish(Twist())
         print("  ⏹  Reproducción detenida.")
 
+    def _reset_odometry(self):
+        self.x_            = 0.0
+        self.y_            = 0.0
+        self.omega_r       = 0.0
+        self.omega_l       = 0.0
+        self.yaw_          = 0.0
+        self.prev_ticks_l_ = 0
+        self.prev_ticks_r_ = 0
+        print("  🔄  Odometría reseteada a (0, 0, 0°)")
+
     # ─────────────────────────────────────────────────────────────
     # Loop principal
     # ─────────────────────────────────────────────────────────────
@@ -258,7 +269,7 @@ class RecorderPlayer(Node):
         omega = Twist()
         omega.linear.x  = self.omega_r
         omega.angular.z = self.omega_l
-        self.speed_pub_.publish(omega)  # Publica velocidades para testear sistema de identificación)
+        self.speed_pub_.publish(omega)
 
         t = TransformStamped()
         t.header.stamp            = now_stamp
