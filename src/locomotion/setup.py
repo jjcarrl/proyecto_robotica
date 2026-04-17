@@ -28,6 +28,7 @@ setup(
             'motor_com=locomotion.motor_command:main',
             'graphical_odom=locomotion.trajectory:main',
             'launch=locomotion.launch:main',
+            'motor_control=locomotion.motor_control:main',
         ],
     },
 )

@@ -2,10 +2,13 @@
     "ROS2.distro": "jazzy",
     "python.autoComplete.extraPaths": [
         "/home/robotica/proyecto_robotica/install/locomotion/lib/python3.12/site-packages",
-        "/opt/ros/jazzy/lib/python3.12/site-packages"
+        "/opt/ros/jazzy/lib/python3.12/site-packages",
+        "/home/robotica/.local/lib/python3.12/site-packages"
     ],
     "python.analysis.extraPaths": [
         "/home/robotica/proyecto_robotica/install/locomotion/lib/python3.12/site-packages",
-        "/opt/ros/jazzy/lib/python3.12/site-packages"
-    ]
+        "/opt/ros/jazzy/lib/python3.12/site-packages",
+        "/home/robotica/.local/lib/python3.12/site-packages"
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }
