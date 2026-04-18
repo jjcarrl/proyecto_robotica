@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<robot name="diff_robot">
+
+  <!-- Base footprint: projection of robot on the ground -->
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0.04"/>  <!-- wheels have 0.04m radius, so base_link is 0.04m above ground -->
+  </joint>
+
+  <!-- Main chassis: 20x20cm, roughly 8cm tall -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.20 0.20 0.08"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </visual>
+  </link>
+
+  <!-- Left wheel: radius=0.04m (diameter 0.08m), 0.02m wide -->
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel"/>
+    <origin xyz="-0.06 0.1 -0.04" rpy="-1.5708 0 0"/> 
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="left_wheel">
+    <visual>
+      <geometry>
+        <cylinder radius="0.04" length="0.02"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <!-- Right wheel: radius=0.04m (diameter 0.08m), 0.02m wide -->
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_wheel"/>
+    <origin xyz="-0.06 -0.1 -0.04" rpy="-1.5708 0 0"/>  <!-- 0.1m = half of 0.2m wheelbase -->
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="right_wheel">
+    <visual>
+      <geometry>
+        <cylinder radius="0.04" length="0.02"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <!-- Caster wheel: small passive wheel at the back -->
+  <joint name="caster_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="caster_wheel"/>
+    <origin xyz="0.08 0 -0.04"/>  <!-- rear of chassis, slightly below base_link -->
+  </joint>
+
+  <link name="caster_wheel">
+    <visual>
+      <geometry>
+        <sphere radius="0.01"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="-0.08 0 0.06" rpy="0 1.5708 3.14159"/>
+  </joint>
+
+  <link name="imu_link"/>
+
+  <!-- LIDAR placeholder: add when you have the sensor -->
+  <!-- Uncomment and adjust xyz when you know where it will be mounted
+  <joint name="laser_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser"/>
+    <origin xyz="0 0 0.08"/>
+  </joint>
+
+  <link name="laser"/>
+  -->
+
+</robot>

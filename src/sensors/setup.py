@@ -27,6 +27,7 @@ setup(
         'odometry_node = sensors.odometry:main',
         'camera_node = sensors.camera:main',
         'images_node = sensors.images:main',
+        'encoders_node = sensors.encoders:main',
         ],
     },
 )

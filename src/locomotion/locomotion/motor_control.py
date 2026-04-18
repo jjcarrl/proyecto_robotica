@@ -148,6 +148,8 @@ class MotorControlNode(Node):
         control_l = self.pid_L(enc_l)
 
         if es < 0.05:
+            es=0.0
+            eth=0.0
             control_r = 0.0
             control_l = 0.0
 

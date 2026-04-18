@@ -169,7 +169,7 @@ def _udp_listener():
 
 def main():
     threading.Thread(target=_udp_listener, daemon=True).start()
-    print("Dashboard → http://0.0.0.0:5000  |  UDP → 5001")
+    #print("Dashboard → http://0.0.0.0:5000  |  UDP → 5001")
     app.run(host="0.0.0.0", port=5000, threaded=True)
 
 
