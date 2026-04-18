@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
+"""
+Servidor de trayectoria standalone — sin ROS.
 
-import math
+Endpoints:
+  POST /push   {"x", "y", "yaw_deg", "vel", "timestamp"}  → actualiza estado
+  POST /reset                                              → limpia trayectoria
+  GET  /data                                              → devuelve estado actual (JSON)
+  GET  /                                                  → dashboard HTML
+"""
+
 import threading
-
-import rclpy
-from rclpy.node import Node
-from nav_msgs.msg import Odometry
-from std_msgs.msg import String
-
-from flask import Flask, render_template_string
-from flask_socketio import SocketIO
+from flask import Flask, jsonify, request, render_template_string
 
 
 HTML = """
@@ -18,7 +19,6 @@ HTML = """
 <head>
   <meta charset="UTF-8">
   <title>Robot Dashboard</title>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,7 +33,8 @@ HTML = """
     .stat .label { font-size: 0.75rem; color: #a6adc8; margin-bottom: 4px; }
     .stat .value { font-size: 1.4rem; font-weight: bold; color: #89b4fa; }
     .stat .unit  { font-size: 0.7rem; color: #6c7086; }
-    .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #a6e3a1; margin-right: 6px; animation: pulse 1.5s infinite; }
+    .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+                  background: #a6e3a1; margin-right: 6px; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   </style>
 </head>
@@ -66,12 +67,10 @@ HTML = """
 </div>
 
 <script>
-  const socket = io(window.location.origin);
-
   let xs = [0], ys = [0], times = [0], yaws_deg = [0];
-  let t0 = null;
+  let t0 = null, lastReset = 0;
 
-  const LAYOUT_BASE = {
+  const BASE = {
     paper_bgcolor: '#313244', plot_bgcolor: '#1e1e2e',
     font: { color: '#cdd6f4' },
     margin: { t: 10, b: 40, l: 55, r: 10 },
@@ -82,7 +81,7 @@ HTML = """
     { x: xs, y: ys, mode: 'lines', line: { color: '#89b4fa', width: 2 }, name: 'Trayectoria' },
     { x: [0], y: [0], mode: 'markers', marker: { color: '#a6e3a1', size: 12 }, name: 'Inicio' },
     { x: [0], y: [0], mode: 'markers', marker: { color: '#f38ba8', size: 12 }, name: 'Robot' },
-  ], { ...LAYOUT_BASE,
+  ], { ...BASE,
     xaxis: { title: 'X (m)', gridcolor: '#45475a', zeroline: false },
     yaxis: { title: 'Y (m)', gridcolor: '#45475a', zeroline: false, scaleanchor: 'x' },
     showlegend: true,
@@ -90,37 +89,44 @@ HTML = """
 
   Plotly.newPlot('plot-yaw', [
     { x: times, y: yaws_deg, mode: 'lines', line: { color: '#cba6f7', width: 2 }, name: 'Yaw' },
-  ], { ...LAYOUT_BASE,
+  ], { ...BASE,
     xaxis: { title: 'Tiempo (s)', gridcolor: '#45475a' },
     yaxis: { title: 'Yaw (°)',    gridcolor: '#45475a' },
   }, { responsive: true });
 
-  socket.on('odom_data', (d) => {
-    if (t0 === null) t0 = d.timestamp;
-    const t = d.timestamp - t0;
+  async function poll() {
+    try {
+      const d = await fetch('/data').then(r => r.json());
 
-    xs.push(d.x);
-    ys.push(d.y);
-    times.push(t);
-    yaws_deg.push(d.yaw_deg);
+      if (d.reset_count !== lastReset) {
+        lastReset = d.reset_count;
+        xs=[0]; ys=[0]; times=[0]; yaws_deg=[0]; t0=null;
+        Plotly.update('plot-traj', { x:[[0],[0],[0]], y:[[0],[0],[0]] }, {}, [0,1,2]);
+        Plotly.update('plot-yaw',  { x:[[0]], y:[[0]] }, {}, [0]);
+      }
 
-    Plotly.update('plot-traj',
-      { x: [xs, [xs[0]], [d.x]], y: [ys, [ys[0]], [d.y]] },
-      {}, [0, 1, 2]
-    );
-    Plotly.update('plot-yaw', { x: [times], y: [yaws_deg] }, {}, [0]);
+      if (t0 === null) t0 = d.timestamp;
+      const t = d.timestamp - t0;
 
-    document.getElementById('val-x').textContent   = d.x.toFixed(3);
-    document.getElementById('val-y').textContent   = d.y.toFixed(3);
-    document.getElementById('val-yaw').textContent = d.yaw_deg.toFixed(1);
-    document.getElementById('val-vel').textContent = d.vel.toFixed(3);
-  });
+      xs.push(d.x);
+      ys.push(d.y);
+      times.push(t);
+      yaws_deg.push(d.yaw_deg);
 
-  socket.on('reset', () => {
-    xs=[0]; ys=[0]; times=[0]; yaws_deg=[0]; t0=null;
-    Plotly.update('plot-traj', { x:[[0],[0],[0]], y:[[0],[0],[0]] }, {}, [0,1,2]);
-    Plotly.update('plot-yaw',  { x:[[0]], y:[[0]] }, {}, [0]);
-  });
+      Plotly.update('plot-traj',
+        { x: [xs, [xs[0]], [d.x]], y: [ys, [ys[0]], [d.y]] },
+        {}, [0, 1, 2]
+      );
+      Plotly.update('plot-yaw', { x: [times], y: [yaws_deg] }, {}, [0]);
+
+      document.getElementById('val-x').textContent   = d.x.toFixed(3);
+      document.getElementById('val-y').textContent   = d.y.toFixed(3);
+      document.getElementById('val-yaw').textContent = d.yaw_deg.toFixed(1);
+      document.getElementById('val-vel').textContent = d.vel.toFixed(3);
+    } catch (_) {}
+  }
+
+  setInterval(poll, 100);
 </script>
 </body>
 </html>
@@ -128,7 +134,9 @@ HTML = """
 
 
 app = Flask(__name__)
-sio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
+
+_state = {"x": 0.0, "y": 0.0, "yaw_deg": 0.0, "vel": 0.0, "timestamp": 0.0, "reset_count": 0}
+_lock  = threading.Lock()
 
 
 @app.route("/")
@@ -136,94 +144,32 @@ def index():
     return render_template_string(HTML)
 
 
-class TrajectoryPlotter(Node):
-    def __init__(self):
-
-        self.origin_x_ = None
-        self.origin_y_ = None 
-
-        super().__init__("trajectory_plotter")
-
-        self.xs_     = [0.0]
-        self.ys_     = [0.0]
-        self.yaws_   = [0.0]
-        self.prev_x_ = 0.0
-        self.prev_y_ = 0.0
-        self.prev_t_ = None
-        self.lock_   = threading.Lock()
-
-        self.odom_sub_ = self.create_subscription(
-            Odometry, "/odom", self.odom_callback, 10
-        )
-        self.mode_sub_ = self.create_subscription(
-            String, "/motor_mode", self.mode_callback, 10
-        )
-
-        self.get_logger().info(
-            "TrajectoryPlotter listo.\n"
-            "  Abre en tu navegador: http://192.168.1.17:5000"
-        )
-
-    def odom_callback(self, msg: Odometry):
-        x   = msg.pose.pose.position.x
-        y   = msg.pose.pose.position.y
-        qz  = msg.pose.pose.orientation.z
-        qw  = msg.pose.pose.orientation.w
-        yaw = 2.0 * math.atan2(qz, qw)
-        now = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
-
-        if self.prev_t_ is not None and (now - self.prev_t_) > 0:
-            vel = math.hypot(x - self.prev_x_, y - self.prev_y_) / (now - self.prev_t_)
-        else:
-            vel = 0.0
-
-        self.prev_x_ = x
-        self.prev_y_ = y
-        self.prev_t_ = now
-
-        with self.lock_:
-            if abs(x - self.xs_[-1]) > 0.001 or abs(y - self.ys_[-1]) > 0.001:
-                self.xs_.append(x)
-                self.ys_.append(y)
-                self.yaws_.append(yaw)
-
-        sio.emit("odom_data", {
-            "x":         round(x,   4),
-            "y":         round(y,   4),
-            "yaw_deg":   round(math.degrees(yaw), 2),
-            "vel":       round(vel, 4),
-            "timestamp": now,
-        })
-
-    def mode_callback(self, msg: String):
-        cmd = msg.data.strip().lower()
-        if cmd in ("record", "play"):
-            sio.emit("reset")
-            with self.lock_:
-                self.xs_   = [0.0]
-                self.ys_   = [0.0]
-                self.yaws_ = [0.0]
+@app.route("/data")
+def data():
+    with _lock:
+        return jsonify(dict(_state))
 
 
-def main(args=None):
-    rclpy.init(args=args)
-    node = TrajectoryPlotter()
+@app.route("/push", methods=["POST"])
+def push():
+    d = request.get_json(force=True, silent=True) or {}
+    with _lock:
+        for key in ("x", "y", "yaw_deg", "vel", "timestamp"):
+            if key in d:
+                _state[key] = d[key]
+    return "", 204
 
-    flask_thread = threading.Thread(
-        target=lambda: sio.run(
-            app, host="0.0.0.0", port=5000, allow_unsafe_werkzeug=True
-        ),
-        daemon=True
-    )
-    flask_thread.start()
 
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        node.destroy_node()
-        rclpy.shutdown()
+@app.route("/reset", methods=["POST"])
+def reset():
+    with _lock:
+        _state["reset_count"] += 1
+    return "", 204
+
+
+def main():
+    print("Dashboard → http://0.0.0.0:5000")
+    app.run(host="0.0.0.0", port=5000, threaded=True)
 
 
 if __name__ == "__main__":

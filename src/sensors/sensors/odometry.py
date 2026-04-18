@@ -5,6 +5,7 @@ import csv
 import time
 import math
 import threading
+import urllib.request, json
 
 from gpiozero.pins.lgpio import LGPIOFactory
 from gpiozero import Device, RotaryEncoder
@@ -28,8 +29,8 @@ PIN_ENC_R_B = 24
 # =========================
 # Parámetros del robot
 # =========================
-ENCODER_PPR  = 341.2
-WHEEL_DIAM_M = 0.066
+ENCODER_PPR  = 562
+WHEEL_DIAM_M = 0.08
 WHEEL_BASE   = 0.20
 DIST_PER_TICK = (math.pi * WHEEL_DIAM_M) / ENCODER_PPR
 
@@ -281,9 +282,23 @@ class RecorderPlayer(Node):
         t.transform.rotation.w    = math.cos(self.yaw_ / 2.0)
         self.tf_broadcaster_.sendTransform(t)
 
+        self._push_to_dashboard(self.x_, self.y_, math.degrees(self.yaw_), (self.omega_r + self.omega_l)/2, now_stamp.sec + now_stamp.nanosec * 1e-9)   
+
     # ─────────────────────────────────────────────────────────────
     # Grabación
     # ─────────────────────────────────────────────────────────────
+    def _push_to_dashboard(self, x, y, yaw_deg, vel, timestamp):
+        data = json.dumps({"x": x, "y": y, "yaw_deg": yaw_deg,
+                        "vel": vel, "timestamp": timestamp}).encode()
+        try:
+            urllib.request.urlopen(
+                urllib.request.Request("http://localhost:5000/push",
+                                    data=data,
+                                    headers={"Content-Type": "application/json"}),
+                timeout=0.05
+            )
+        except Exception:
+            pass
 
     def _record_sample(self, timestamp: float):
         self.record_data_.append({

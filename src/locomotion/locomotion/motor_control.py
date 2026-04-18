@@ -36,10 +36,10 @@ class MotorControlNode(Node):
         )
 
         self.ref_sub_ = self.create_subscription(
-            Odometry, "/odom", self.odom_callback, 10
+            Odometry, "/ref", self.ref_callback, 10
         )
         self.enc_sub_ = self.create_subscription(
-            Twist, "/odom", self.enc_callback, 10
+            Twist, "/omega", self.enc_callback, 10
         )
 
         self.motor_l = Motor(
@@ -57,6 +57,10 @@ class MotorControlNode(Node):
         self.curr_pose_ = Odometry()
         self.curr_ref_ = Odometry()
         self.enc_speed_ = Twist()
+        
+        # Referencia inicial
+        self.curr_ref_.pose.pose.position.x = 2.0
+        self.curr_ref_.pose.pose.position.y = 0.0
 
         # Parámetros del robot
         self.r = 0.08 # Radio de las ruedas (m)
@@ -75,6 +79,9 @@ class MotorControlNode(Node):
 
         self.pid_R.output_limits = (-1.0, 1.0)
         self.pid_L.output_limits = (-1.0, 1.0)
+
+        self.pid_R.sample_time = 0.02
+        self.pid_L.sample_time = 0.02
 
         # Log de inicio
         self.get_logger().info("Nodo motor_command iniciado.")
@@ -101,7 +108,9 @@ class MotorControlNode(Node):
         
 
         # Control de velocidad
-        theta = self.curr_pose_.pose.pose.orientation.z
+        qz = self.curr_pose_.pose.pose.orientation.z
+        qw = self.curr_pose_.pose.pose.orientation.w
+        theta = 2.0 * math.atan2(qz, qw)
         x = self.curr_pose_.pose.pose.position.x
         y = self.curr_pose_.pose.pose.position.y
         x_ref = self.curr_ref_.pose.pose.position.x
@@ -137,6 +146,10 @@ class MotorControlNode(Node):
 
         control_r = self.pid_R(enc_r)
         control_l = self.pid_L(enc_l)
+
+        if es < 0.05:
+            control_r = 0.0
+            control_l = 0.0
 
         self.motor_l.value = control_l
         self.motor_r.value = control_r
