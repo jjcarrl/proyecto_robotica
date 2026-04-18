@@ -9,8 +9,10 @@ Endpoints:
   GET  /                                                  → dashboard HTML
 """
 
+import socket
+import json
 import threading
-from flask import Flask, jsonify, request, render_template_string
+from flask import Flask, jsonify, render_template_string
 
 
 HTML = """
@@ -150,25 +152,24 @@ def data():
         return jsonify(dict(_state))
 
 
-@app.route("/push", methods=["POST"])
-def push():
-    d = request.get_json(force=True, silent=True) or {}
-    with _lock:
-        for key in ("x", "y", "yaw_deg", "vel", "timestamp"):
-            if key in d:
-                _state[key] = d[key]
-    return "", 204
-
-
-@app.route("/reset", methods=["POST"])
-def reset():
-    with _lock:
-        _state["reset_count"] += 1
-    return "", 204
+def _udp_listener():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(("0.0.0.0", 5001))
+    while True:
+        data, _ = sock.recvfrom(1024)
+        try:
+            d = json.loads(data.decode())
+            with _lock:
+                for key in ("x", "y", "yaw_deg", "vel", "timestamp"):
+                    if key in d:
+                        _state[key] = d[key]
+        except Exception:
+            pass
 
 
 def main():
-    print("Dashboard → http://0.0.0.0:5000")
+    threading.Thread(target=_udp_listener, daemon=True).start()
+    print("Dashboard → http://0.0.0.0:5000  |  UDP → 5001")
     app.run(host="0.0.0.0", port=5000, threaded=True)
 
 

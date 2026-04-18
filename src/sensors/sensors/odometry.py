@@ -5,7 +5,8 @@ import csv
 import time
 import math
 import threading
-import urllib.request, json
+import socket
+import json
 
 from gpiozero.pins.lgpio import LGPIOFactory
 from gpiozero import Device, RotaryEncoder
@@ -78,6 +79,9 @@ class RecorderPlayer(Node):
         # ── Timer principal 50 Hz ────────────────────────────────
         self.timer_period_ = 0.02  # 20 ms -> 50 Hz
         self.timer_ = self.create_timer(self.timer_period_, self.main_loop)
+
+        # ── Socket UDP → dashboard ───────────────────────────────
+        self._udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         # ── Hilo de teclado ──────────────────────────────────────
         self.keyboard_thread_ = threading.Thread(
@@ -288,17 +292,9 @@ class RecorderPlayer(Node):
     # Grabación
     # ─────────────────────────────────────────────────────────────
     def _push_to_dashboard(self, x, y, yaw_deg, vel, timestamp):
-        data = json.dumps({"x": x, "y": y, "yaw_deg": yaw_deg,
-                        "vel": vel, "timestamp": timestamp}).encode()
-        try:
-            urllib.request.urlopen(
-                urllib.request.Request("http://localhost:5000/push",
-                                    data=data,
-                                    headers={"Content-Type": "application/json"}),
-                timeout=0.05
-            )
-        except Exception:
-            pass
+        payload = json.dumps({"x": x, "y": y, "yaw_deg": yaw_deg,
+                              "vel": vel, "timestamp": timestamp}).encode()
+        self._udp_sock.sendto(payload, ("127.0.0.1", 5001))
 
     def _record_sample(self, timestamp: float):
         self.record_data_.append({
