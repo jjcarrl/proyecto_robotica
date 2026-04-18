@@ -32,7 +32,7 @@ class MotorControlNode(Node):
     def __init__(self):
         super().__init__("motor_control_node")
         self.odom_sub_ = self.create_subscription(
-            Odometry, "/odom", self.odom_callback, 10
+            Odometry, "/odometry/filtered", self.odom_callback, 10
         )
 
         self.ref_sub_ = self.create_subscription(

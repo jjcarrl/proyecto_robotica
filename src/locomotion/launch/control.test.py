@@ -22,4 +22,10 @@ def generate_launch_description():
             name='encoders_node',
             output='screen',
         ),
+        Node(
+            package='sensors',
+            executable='mpu_node',
+            name='mpu_node',
+            output='screen',
+        )
     ])

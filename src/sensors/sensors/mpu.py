@@ -30,11 +30,6 @@ class MPUNode(Node):
 
         self.imu = mpu6050.mpu6050(0x68)
 
-        self.wheel_radius = 0.08
-        self.encoder_resolution = self.get_parameter('encoder_resolution').get_parameter_value().integer_value        
-        # Initialize encoder
-        self.encoder = RotaryEncoder(a=17, b=27, max_steps=self.encoder_resolution)
-        
         # Initialize publishers and TF broadcaster
         self.imu_pub = self.create_publisher(Imu, '/imu', 10)
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
@@ -67,13 +62,9 @@ class MPUNode(Node):
         imu_msg.header.stamp = self.get_clock().now().to_msg()
         imu_msg.header.frame_id = 'base_link'
 
-        imu_msg.linear_acceleration.x = acc['x']  # robot forward
-        imu_msg.linear_acceleration.y =  acc['y']  # robot left
-        imu_msg.linear_acceleration.z = acc['z']  # robot up
+        imu_msg.linear_acceleration.x = -acc['y']  # robot forward
 
-        imu_msg.angular_velocity.x =  gyro['x']*math.pi/180   # robot roll
-        imu_msg.angular_velocity.y = gyro['y']*math.pi/180   # robot pitch
-        imu_msg.angular_velocity.z = gyro['z']*math.pi/180   # robot yaw rate ← key one
+        imu_msg.angular_velocity.z = -gyro['x']*math.pi/180   # robot yaw rate ← key one
 
 
         gyro_noise = (0.005 * math.pi/180) ** 2 * 100  # ~7.6e-7
@@ -89,3 +80,11 @@ class MPUNode(Node):
         ]
 
         self.imu_pub.publish(imu_msg)
+
+def main():
+    import rclpy
+    rclpy.init()
+    node = MPUNode()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
