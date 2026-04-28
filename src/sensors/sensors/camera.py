@@ -3,32 +3,40 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
+from picamera2 import Picamera2
+
 
 class CameraNode(Node):
 
     def __init__(self):
         super().__init__('camera_node')
         self.pub = self.create_publisher(Image, '/camera/image_raw', 10)
-        
-        self.cameraDeviceNumber=0
-        self.camera = cv2.VideoCapture(self.cameraDeviceNumber)
 
-        self.bridgeObject = CvBridge() #Imagenes de opencv a topicos ros
+        self.bridge = CvBridge()
 
-        self.timer_period_ = 0.02
-        self.timer_ = self.create_timer(self.timer_period_,self.publish_frame)
+        self.cam = Picamera2()
+        config = self.cam.create_video_configuration(
+            main={"size": (820, 640), "format": "RGB888"}
+        )
+        self.cam.configure(config)
+        self.cam.start()
 
+        self.timer_period_ = 0.02  # 50 Hz
+        self.timer_ = self.create_timer(self.timer_period_, self.publish_frame)
         self.img_counter_ = 0
 
     def publish_frame(self):
+        frame = self.cam.capture_array()
+        ros2_img = self.bridge.cv2_to_imgmsg(frame, encoding="bgr8")
+        ros2_img.header.stamp = self.get_clock().now().to_msg()
+        ros2_img.header.frame_id = 'camera_link'
+        self.pub.publish(ros2_img)
+        self.img_counter_ += 1
 
-        success, frame = self.camera.read()
-        frame = cv2.resize(frame, (820,640), interpolation=cv2.INTER_CUBIC)
+    def destroy_node(self):
+        self.cam.stop()
+        super().destroy_node()
 
-        if success:
-            ros2_img = self.bridgeObject.cv2_to_imgmsg(frame, encoding="bgr8")
-            self.pub.publish(ros2_img)
-            self.img_counter_ += 1
 
 def main():
     rclpy.init()

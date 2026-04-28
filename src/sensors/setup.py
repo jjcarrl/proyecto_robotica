@@ -35,6 +35,8 @@ setup(
         'images_node = sensors.images:main',
         'encoders_node = sensors.encoders:main',
         'mpu_node = sensors.mpu:main',
+        'vision_bridge_node = sensors.vision_bridge:main',
+        'arm_bridge_node = sensors.arm_bridge:main',
         ],
     },
 )
