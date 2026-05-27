@@ -24,8 +24,8 @@ import tf2_ros
 # =========================
 PIN_ENC_L_A = 20
 PIN_ENC_L_B = 21
-PIN_ENC_R_A = 23
-PIN_ENC_R_B = 24
+PIN_ENC_R_A = 24
+PIN_ENC_R_B = 23
 
 # =========================
 # Parámetros del robot
