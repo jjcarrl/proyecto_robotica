@@ -3,29 +3,19 @@ from gpiozero import AngularServo
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Bool, Int32
+from sensor_msgs.msg import Joy
+from std_msgs.msg import Int32
 
-# Posiciones disponibles
+BTN_X  = 0   # X (Cruz) — toggle servo
 POS_0  = 0
 POS_90 = 90
 
 
 class ServoNode(Node):
-    """
-    Controla un servo con dos posiciones fijas: 0° y 90°.
-
-    Suscripciones:
-      /servo/cmd (Bool) — False → 0°,  True → 90°
-
-    Publicaciones:
-      /servo/state (Int32) — posicion actual en grados (0 o 90)
-    """
-
     def __init__(self):
         super().__init__('servo_node')
 
         self.declare_parameter('gpio_pin', 18)
-
         gpio_pin = self.get_parameter('gpio_pin').value
 
         factory = LGPIOFactory(chip=4)
@@ -37,30 +27,25 @@ class ServoNode(Node):
             max_pulse_width=0.002,
             pin_factory=factory,
         )
-
-        self._angle = POS_0
+        self._angle    = POS_0
+        self._prev_btn = False
         self.servo.angle = POS_0
 
-        self.sub = self.create_subscription(Bool, '/servo/cmd', self._cmd_cb, 10)
+        self.create_subscription(Joy, '/joy', self._joy_cb, 10)
         self.pub = self.create_publisher(Int32, '/servo/state', 10)
 
-        self.create_timer(1.0, self._publish_state)
+        self.get_logger().info(f'ServoNode listo — GPIO{gpio_pin}')
 
-        self.get_logger().info(f'ServoNode listo — GPIO{gpio_pin}, posicion inicial: {POS_0}°')
-
-    def _cmd_cb(self, msg: Bool):
-        target = POS_90 if msg.data else POS_0
-        if target == self._angle:
-            return
-        self.servo.angle = target
-        self._angle = target
-        self.get_logger().info(f'Servo → {target}°')
-        self._publish_state()
-
-    def _publish_state(self):
-        out = Int32()
-        out.data = self._angle
-        self.pub.publish(out)
+    def _joy_cb(self, msg: Joy):
+        cur = len(msg.buttons) > BTN_X and bool(msg.buttons[BTN_X])
+        if cur and not self._prev_btn:
+            target = POS_0 if self._angle == POS_90 else POS_90
+            self.servo.angle = target
+            self._angle = target
+            out = Int32(); out.data = target
+            self.pub.publish(out)
+            self.get_logger().info(f'Servo → {target}°')
+        self._prev_btn = cur
 
     def destroy_node(self):
         self.servo.detach()

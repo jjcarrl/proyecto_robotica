@@ -129,15 +129,7 @@ def generate_launch_description():
     ]
     nav2_launch = TimerAction(period=8.0, actions=nav2_nodes)
 
-    # ── 6. RC control (joy → /cmd_vel) ────────────────────────────────────────
-    rc_control_node = Node(
-        package='locomotion',
-        executable='rc_control',
-        name='rc_control_node',
-        output='screen',
-    )
-
-    # ── 7. Joy ────────────────────────────────────────────────────────────────
+    # ── 6. Joy (conectado al PC) ──────────────────────────────────────────────
     joy_node = Node(
         package='joy',
         executable='joy_node',
@@ -146,25 +138,12 @@ def generate_launch_description():
         parameters=[{'device_id': 0}],
     )
 
-    # ── 8. Servo (GPIO 18) ────────────────────────────────────────────────────
-    servo_node = Node(
-        package='sensors',
-        executable='servo_node',
-        name='servo_node',
+    # ── 7. RC control (joy → /motor_cmd, corre en PC) ────────────────────────
+    rc_control_node = Node(
+        package='locomotion',
+        executable='rc_control',
+        name='rc_control_node',
         output='screen',
-        parameters=[{'gpio_pin': 18}],
-    )
-
-    # ── 9. Stepper / eje Z (via Arduino serial) ───────────────────────────────
-    stepper_node = Node(
-        package='sensors',
-        executable='stepper_node',
-        name='stepper_node',
-        output='screen',
-        parameters=[{
-            'serial_port': '/dev/arduino',
-            'baudrate': 115200,
-        }],
     )
 
     nodes = [
@@ -173,10 +152,8 @@ def generate_launch_description():
         ekf_node,
         slam_launch,
         nav2_launch,
-        rc_control_node,
         joy_node,
-        servo_node,
-        stepper_node,
+        rc_control_node,
     ]
     nodes.append(rf2o_node)
 
