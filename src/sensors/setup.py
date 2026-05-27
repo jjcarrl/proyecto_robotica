@@ -42,6 +42,7 @@ setup(
         'lidar_node = sensors.lidar:main',
         'lidar_viz_node = sensors.lidar_viz:main',
         'imu_viz_node = sensors.imu_viz:main',
+        'shape_color_detector_node = sensors.shape_color_detector:main',
         ],
     },
 )

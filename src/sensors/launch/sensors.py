@@ -41,7 +41,7 @@ def generate_launch_description():
             executable='servo_node',
             name='servo_node',
             output='screen',
-            parameters=[{'gpio_pin': 18}],
+            parameters=[{'gpio_pin': 12, 'gpio_chip': 4}],
         ),
         Node(
             package='sensors',
