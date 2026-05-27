@@ -12,11 +12,11 @@ Device.pin_factory = LGPIOFactory(chip=4)
 # =========================
 # Pines GPIO (BCM)
 # =========================
-PIN_FORWARD_L = 17   # IN1 17
-PIN_BACKWARD_L = 27  # IN2 27
+PIN_FORWARD_R = 27   # IN1 27
+PIN_BACKWARD_R = 17  # IN2 17
 
-PIN_FORWARD_R = 5    # IN3 5
-PIN_BACKWARD_R = 6   # IN4 6
+PIN_FORWARD_L = 5    # IN3 6
+PIN_BACKWARD_L = 6   # IN4 5
 
 
 class MotorCommand(Node):

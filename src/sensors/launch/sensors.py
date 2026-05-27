@@ -35,6 +35,5 @@ def generate_launch_description():
             executable='motor_com',
             name='motor_command_node',
             output='screen',
-            remappings=[('/motor_cmd', '/cmd_vel')],
         ),
     ])
