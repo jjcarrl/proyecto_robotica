@@ -30,4 +30,11 @@ def generate_launch_description():
                 'frame_id': 'laser',
             }],
         ),
-])
+        Node(
+            package='locomotion',
+            executable='motor_com',
+            name='motor_command_node',
+            output='screen',
+            remappings=[('/motor_cmd', '/cmd_vel')],
+        ),
+    ])
