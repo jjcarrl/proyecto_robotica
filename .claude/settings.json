@@ -14,7 +14,17 @@
       "Bash(nm -D /opt/ros/jazzy/lib/libfastcdr.so.2)",
       "Bash(apt-cache policy *)",
       "Bash(ping -c 2 192.168.1.19)",
-      "Bash(colcon build *)"
+      "Bash(awk '{print $3}')",
+      "Bash(ip -o -f inet addr show)",
+      "Bash(awk '/scope global/ {print $4}')",
+      "Bash(grep -v \"^--$\")",
+      "Bash(sudo nmap -sn 192.168.1.0/24)",
+      "Bash(avahi-resolve -n raspberrypi.local)",
+      "Bash(avahi-resolve -n robotica.local)",
+      "Bash(ping -c1 raspberrypi.local)",
+      "Bash(ros2 topic *)",
+      "Bash(kill %1)",
+      "Bash(xargs cat)"
     ],
     "additionalDirectories": [
       "/home/robotica"

@@ -60,20 +60,23 @@ def generate_launch_description():
     )
 
     # ── 2. rf2o lidar odometry (/scan → /odom_rf2o) ───────────────────────────
-    rf2o_node = Node(
-        package='rf2o_laser_odometry',
-        executable='rf2o_laser_odometry_node',
-        name='rf2o_laser_odometry',
-        output='screen',
-        parameters=[{
-            'laser_scan_topic':     '/scan',
-            'odom_topic':           '/odom_rf2o',
-            'publish_tf':           False,
-            'base_frame_id':        'base_link',
-            'odom_frame_id':        'odom',
-            'freq':                 10.0,
-            'init_pose_from_topic': '',
-        }],
+    rf2o_node = TimerAction(
+        period=2.0,
+        actions=[Node(
+            package='rf2o_laser_odometry',
+            executable='rf2o_laser_odometry_node',
+            name='rf2o_laser_odometry',
+            output='screen',
+            parameters=[{
+                'laser_scan_topic':     '/scan',
+                'odom_topic':           '/odom_rf2o',
+                'publish_tf':           False,
+                'base_frame_id':        'base_link',
+                'odom_frame_id':        'odom',
+                'freq':                 10.0,
+                'init_pose_from_topic': '',
+            }],
+        )]
     )
 
     # ── 3. EKF ────────────────────────────────────────────────────────────────
@@ -152,7 +155,6 @@ def generate_launch_description():
         rc_control_node,
         joy_node,
     ]
-    if rf2o_node is not None:
-        nodes.insert(2, rf2o_node)
+    nodes.append(rf2o_node)
 
     return LaunchDescription(nodes)
