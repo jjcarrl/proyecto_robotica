@@ -16,6 +16,7 @@ Device.pin_factory = LGPIOFactory(chip=0)
 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist, TransformStamped
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
@@ -63,7 +64,7 @@ class EncodersNode(Node):
 
         # ── Publicadores ─────────────────────────────────────────
         self.speed_pub_ = self.create_publisher(Twist,    "/omega", 10)
-        self.odom_pub_ = self.create_publisher(Odometry, "/odom",      10)
+        self.odom_pub_ = self.create_publisher(Odometry, "/odom", qos_profile_sensor_data)
         self.joint_pub_ = self.create_publisher(JointState, '/joint_states', 10)
 
         # ── Socket UDP para dashboard web ───────────────────────

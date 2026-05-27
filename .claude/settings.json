@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ros2 pkg *)",
+      "Bash(sudo apt install -y ros-jazzy-slam-toolbox ros-jazzy-nav2-bringup)",
+      "Bash(kill 17051 17054)",
+      "Bash(grep -v \"^$\")",
+      "Bash(chronyc tracking *)",
+      "Bash(timedatectl)",
+      "Bash(dpkg -l)",
+      "Bash(awk '{print $2, $3}')"
+    ],
+    "additionalDirectories": [
+      "/home/robotica"
+    ]
+  }
+}

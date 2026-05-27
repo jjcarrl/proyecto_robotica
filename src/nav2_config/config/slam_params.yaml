@@ -40,10 +40,11 @@ slam_toolbox:
 
     # Timing
     minimum_time_interval: 0.5
-    transform_timeout: 0.2
+    transform_timeout: 1.0
     transform_publish_period: 0.02
     map_update_interval: 5.0
     tf_buffer_duration: 30.0
+    transform_tolerance: 0.5
     stack_size_to_use: 40000000
 
     # Misc
