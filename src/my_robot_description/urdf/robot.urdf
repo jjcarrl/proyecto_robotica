@@ -7,16 +7,16 @@
   <joint name="base_footprint_joint" type="fixed">
     <parent link="base_footprint"/>
     <child link="base_link"/>
-    <origin xyz="0 0 0.04"/>  <!-- wheels have 0.04m radius, so base_link is 0.04m above ground -->
+    <origin xyz="-0.05 0 0.04"/>  <!-- wheels have 0.04m radius, so base_link is 0.04m above ground -->
   </joint>
 
   <!-- Main chassis: 20x20cm, roughly 8cm tall -->
   <link name="base_link">
     <visual>
       <geometry>
-        <box size="0.20 0.20 0.08"/>
+        <box size="0.18 0.20 0.26"/>
       </geometry>
-      <origin xyz="0 0 0"/>
+      <origin xyz="0 0 0.13"/>
     </visual>
   </link>
 
@@ -24,7 +24,7 @@
   <joint name="left_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="left_wheel"/>
-    <origin xyz="-0.06 0.1 -0.04" rpy="-1.5708 0 0"/> 
+    <origin xyz="-0.05 0.1 0.04" rpy="-1.5708 0 0"/> 
     <axis xyz="0 0 1"/>
   </joint>
 
@@ -40,7 +40,7 @@
   <joint name="right_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="right_wheel"/>
-    <origin xyz="-0.06 -0.1 -0.04" rpy="-1.5708 0 0"/>  <!-- 0.1m = half of 0.2m wheelbase -->
+    <origin xyz="-0.05 -0.1 0.04" rpy="-1.5708 0 0"/>  <!-- 0.1m = half of 0.2m wheelbase -->
     <axis xyz="0 0 1"/>
   </joint>
 
@@ -56,7 +56,7 @@
   <joint name="caster_joint" type="fixed">
     <parent link="base_link"/>
     <child link="caster_wheel"/>
-    <origin xyz="0.08 0 -0.04"/>  <!-- rear of chassis, slightly below base_link -->
+    <origin xyz="0.08 0 0.035"/>  <!-- rear of chassis, slightly below base_link -->
   </joint>
 
   <link name="caster_wheel">
@@ -70,20 +70,18 @@
   <joint name="imu_joint" type="fixed">
     <parent link="base_link"/>
     <child link="imu_link"/>
-    <origin xyz="-0.08 0 0.06" rpy="0 1.5708 3.14159"/>
+    <origin xyz="-0.035 -0.01 0.22" rpy="0 1.5708 3.14159"/>
   </joint>
 
   <link name="imu_link"/>
 
-  <!-- LIDAR placeholder: add when you have the sensor -->
-  <!-- Uncomment and adjust xyz when you know where it will be mounted
+  <!-- YDLidar X4 Pro montado encima del chasis -->
   <joint name="laser_joint" type="fixed">
     <parent link="base_link"/>
     <child link="laser"/>
-    <origin xyz="0 0 0.08"/>
+    <origin xyz="-0.05 -0.005 0.13"/>
   </joint>
 
   <link name="laser"/>
-  -->
 
 </robot>

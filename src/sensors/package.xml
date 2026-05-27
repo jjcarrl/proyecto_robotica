@@ -21,6 +21,7 @@
   <depend>opencv-python</depend>
   <depend>cv_bridge</depend>
   <depend>cv2</depend>
+  <depend>python3-serial</depend>
   
   <export>
     <build_type>ament_python</build_type>

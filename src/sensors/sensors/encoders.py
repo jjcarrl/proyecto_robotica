@@ -25,8 +25,8 @@ import tf2_ros
 # =========================
 # Pines GPIO encoders (BCM)
 # =========================
-PIN_ENC_L_A = 20
-PIN_ENC_L_B = 21
+PIN_ENC_L_A = 21
+PIN_ENC_L_B = 20
 PIN_ENC_R_A = 23
 PIN_ENC_R_B = 24
 

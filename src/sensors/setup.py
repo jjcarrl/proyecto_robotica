@@ -37,6 +37,9 @@ setup(
         'mpu_node = sensors.mpu:main',
         'vision_bridge_node = sensors.vision_bridge:main',
         'arm_bridge_node = sensors.arm_bridge:main',
+        'lidar_node = sensors.lidar:main',
+        'lidar_viz_node = sensors.lidar_viz:main',
+        'imu_viz_node = sensors.imu_viz:main',
         ],
     },
 )

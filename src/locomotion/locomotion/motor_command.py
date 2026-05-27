@@ -12,11 +12,11 @@ from gpiozero import Motor
 # =========================
 # Pines GPIO (BCM)
 # =========================
-PIN_FORWARD_L = 5   # IN1 5
-PIN_BACKWARD_L = 6  # IN2 6
+PIN_FORWARD_L = 17   # IN1 17
+PIN_BACKWARD_L = 27  # IN2 27
 
-PIN_FORWARD_R = 17    # IN3 17
-PIN_BACKWARD_R = 27   # IN4 27
+PIN_FORWARD_R = 5    # IN3 5
+PIN_BACKWARD_R = 6   # IN4 6
 
 
 class MotorCommand(Node):

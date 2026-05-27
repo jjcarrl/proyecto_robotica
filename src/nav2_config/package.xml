@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>nav2_config</name>
+  <version>0.0.0</version>
+  <description>Nav2 + SLAM configuration and launch for diff_robot</description>
+  <maintainer email="j.carreral@uniandes.edu.co">robotica</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>nav2_bringup</exec_depend>
+  <exec_depend>nav2_bt_navigator</exec_depend>
+  <exec_depend>nav2_controller</exec_depend>
+  <exec_depend>nav2_planner</exec_depend>
+  <exec_depend>nav2_behaviors</exec_depend>
+  <exec_depend>nav2_smoother</exec_depend>
+  <exec_depend>nav2_waypoint_follower</exec_depend>
+  <exec_depend>nav2_velocity_smoother</exec_depend>
+  <exec_depend>nav2_lifecycle_manager</exec_depend>
+  <exec_depend>slam_toolbox</exec_depend>
+  <exec_depend>robot_localization</exec_depend>
+  <exec_depend>my_robot_description</exec_depend>
+  <exec_depend>sensors</exec_depend>
+  <exec_depend>locomotion</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

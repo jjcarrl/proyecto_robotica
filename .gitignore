@@ -16,3 +16,12 @@ __pycache__/
 
 # Environment files
 *.env
+
+# Generated data recordings (motor tests, system ID, trajectories)
+motor_record_*.csv
+system_id_*.csv
+trayectoria_*.png
+
+# ROS2 frame-graph exports
+frames_*.gv
+frames_*.pdf
