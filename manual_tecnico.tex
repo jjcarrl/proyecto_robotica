@@ -1,0 +1,215 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[top=1.8cm, bottom=1.8cm, left=1.8cm, right=1.8cm, columnsep=0.7cm]{geometry}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{multicol}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+
+% ── Colores ────────────────────────────────────────────────────────────────────
+\definecolor{uniblue}{RGB}{0,51,102}
+\definecolor{lightgray}{RGB}{240,240,240}
+
+% ── Secciones compactas ────────────────────────────────────────────────────────
+\titleformat{\section}{\bfseries\small\color{uniblue}}{}{0em}{}[\color{uniblue}\titlerule]
+\titleformat{\subsection}{\bfseries\footnotesize}{}{0em}{}
+\titlespacing{\section}{0pt}{6pt}{3pt}
+\titlespacing{\subsection}{0pt}{4pt}{2pt}
+
+% ── Listas compactas ───────────────────────────────────────────────────────────
+\setlist[itemize]{noitemsep, topsep=2pt, leftmargin=1.2em}
+\setlist[enumerate]{noitemsep, topsep=2pt, leftmargin=1.4em}
+
+% ── Párrafos ───────────────────────────────────────────────────────────────────
+\setlength{\parskip}{3pt}
+\setlength{\parindent}{0pt}
+
+% ── Cabecera ───────────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\footnotesize\textbf{Manual Técnico — Proyecto Final IELE3338L}}
+\fancyhead[R]{\footnotesize Universidad de los Andes · 2026-10}
+\fancyfoot[C]{\footnotesize\thepage}
+
+% ── Comandos auxiliares ────────────────────────────────────────────────────────
+\newcommand{\topic}[1]{\texttt{\small #1}}
+\newcommand{\pkg}[1]{\texttt{\small #1}}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+% ── Título ────────────────────────────────────────────────────────────────────
+\begin{center}
+  {\large\bfseries\color{uniblue}
+    Robot Autónomo para Mapeo, Navegación y Manipulación\\[2pt]
+    en Pista Logística — Proyecto Final}\\[4pt]
+  {\small
+    Curso: IELE3338L · Sección 1--2 · Periodo 2026-10\\
+    Grupo: \textbf{5} \quad|\quad
+    Integrantes: \textbf{Andrés Carlos, Juan Carral}\\
+    Profesor: Jorge López Jiménez · AG: Diego Santiago Jiménez Beltrán}
+\end{center}
+\vspace{-4pt}
+\noindent\rule{\linewidth}{0.8pt}
+\vspace{2pt}
+
+% ── Inicio de dos columnas ────────────────────────────────────────────────────
+\begin{multicols}{2}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Descripción del Sistema}
+
+El robot es un móvil diferencial autónomo capaz de construir un mapa de la pista, localizarse, planear rutas, evitar obstáculos y manipular bloques de colores (rojo, azul, verde) para ubicarlos en sus zonas objetivo. El sistema integra cinco subsistemas: percepción, localización, mapeo, navegación y manipulación, coordinados bajo \textbf{ROS2}.
+
+El procesamiento pesado de visión (cámara cenital) se realiza en un PC externo para no saturar la Raspberry Pi, publicando los resultados vía ROS2.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Hardware}
+
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Componente} & \textbf{Interfaz} & \textbf{Parámetro} \\
+\midrule
+Raspberry Pi 4B       & —          & Computador principal \\
+YDLidar X4 Pro        & Serial     & \texttt{/dev/lidar} \\
+IMU BNO055            & I2C bus 1  & Addr \texttt{0x28} \\
+Encoders (×2)         & GPIO       & 562 PPR \\
+Motores DC (L298N)    & GPIO PWM   & 2 canales \\
+Pi Camera 2           & CSI        & 820×640 px \\
+ESP32 (brazo)         & Serial USB & \texttt{/dev/ttyUSB0} \\
+Arduino (stepper Z)   & Serial USB & \texttt{/dev/arduino} \\
+PC externo (visión)   & WebSocket  & Puerto 8765 \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+
+\textbf{Parámetros cinemáticos:} rueda $\varnothing = 8\,\text{cm}$, base $L = 20\,\text{cm}$.
+
+GPIO motores: izq.\ 5/6, der.\ 17/27. GPIO encoders: izq.\ 20/21, der.\ 23/24.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Arquitectura de Software (ROS2)}
+
+\subsection{Paquetes}
+
+\begin{itemize}
+  \item \pkg{sensors} — percepción: IMU, LiDAR, cámara, encoders, brazo, stepper.
+  \item \pkg{locomotion} — control de motores (PID) y dashboard de trayectoria.
+  \item \pkg{my\_robot\_description} — URDF y configuración EKF.
+  \item \pkg{nav2\_config} — SLAM Toolbox + Nav2 + launch completo.
+\end{itemize}
+
+\subsection{Nodos principales}
+
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Nodo} & \textbf{Publica / Suscribe} \\
+\midrule
+\texttt{mpu\_node}        & pub \topic{/imu} \\
+\texttt{encoders\_node}   & pub \topic{/odom}, \topic{/omega} \\
+\texttt{lidar\_node}      & pub \topic{/scan} \\
+\texttt{camera\_node}     & pub \topic{/camera/image\_raw} \\
+\texttt{vision\_bridge}   & pub \topic{/vision/detections} \\
+\texttt{ekf\_node}        & sub \topic{/odom}, \topic{/imu} → pub \topic{/odometry/filtered} \\
+\texttt{slam\_toolbox}    & sub \topic{/scan} → pub \topic{/map} \\
+\texttt{nav2}             & sub \topic{/map}, \topic{/odometry/filtered} → pub \topic{/cmd\_vel} \\
+\texttt{motor\_control}   & sub \topic{/odometry/filtered}, \topic{/ref} → GPIO \\
+\texttt{arm\_bridge}      & sub \topic{/arm/mode} → serial ESP32 \\
+\texttt{stepper\_node}    & sub \topic{/z\_axis/move} → serial Arduino \\
+\bottomrule
+\end{tabular}
+
+\subsection{Fusión sensorial}
+
+El filtro EKF (\texttt{robot\_localization}) fusiona la odometría de encoders (\topic{/odom}) con la orientación del BNO055 (\topic{/imu}) a 50\,Hz, publicando \topic{/odometry/filtered} hacia Nav2 y el controlador de motores. La localización cenital (cámara del techo) se integra como fuente adicional de corrección de posición $x, y, \theta$ publicada por el PC externo.
+
+\subsection{Control de movimiento}
+
+El controlador cinemático (\texttt{motor\_control}) implementa un controlador proporcional de posición:
+\[
+  v = K_s\, e_s, \quad \omega = K_\theta\, e_\theta
+\]
+con $K_s=0.3$, $K_\theta=2.4$, seguido de un PID de velocidad de rueda ($P=0.775$, $I=28.0$, $D=0.002$) que cierra el lazo sobre los encoders.
+
+% ── Columna derecha ───────────────────────────────────────────────────────────
+\columnbreak
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Secuencia de Arranque}
+
+\begin{enumerate}
+  \item Conectar alimentación. Verificar que los dispositivos seriales estén presentes:\\
+        \texttt{ls /dev/lidar /dev/ttyUSB0 /dev/arduino}
+  \item Sourcear el workspace en la Raspberry Pi:
+        \begin{verbatim}
+source ~/proyecto_robotica/install/setup.bash
+        \end{verbatim}
+  \item Lanzar la pila completa (sensores + EKF + SLAM + Nav2 + motores):
+        \begin{verbatim}
+ros2 launch nav2_config \
+  nav2_bringup.launch.py
+        \end{verbatim}
+  \item En el PC externo (visión cenital), iniciar el cliente WebSocket y esperar conexión con \topic{/vision/detections}.
+  \item Lanzar el brazo manipulador:
+        \begin{verbatim}
+ros2 run sensors arm_bridge_node
+ros2 run sensors stepper_node
+        \end{verbatim}
+  \item Activar el inicio de la misión (pulsador físico o comando de arranque).
+  \item Verificar en RViz2 que el mapa, la odometría y el LiDAR estén activos antes de iniciar la ejecución oficial.
+\end{enumerate}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Herramientas de Monitoreo}
+
+\begin{itemize}
+  \item \textbf{Dashboard de trayectoria:} \texttt{ros2 run locomotion graphical\_odom} → \texttt{http://<ip>:5000} (Plotly, UDP).
+  \item \textbf{RViz2:} visualización de \topic{/map}, \topic{/scan}, pose del robot y ruta planeada.
+  \item \textbf{Estado del brazo:} \texttt{ros2 topic echo /arm/status}.
+  \item \textbf{Posición Z:} \texttt{ros2 topic echo /z\_axis/position}.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Manipulación de Bloques}
+
+El brazo manipulador (4 servos, control mediante ESP32) opera en cuatro modos publicados en \topic{/arm/mode}: \texttt{live} (teleoperación en tiempo real), \texttt{record} (grabación a CSV), \texttt{replay} (reproducción de secuencia grabada) y \texttt{stop} (posición home $= [90°, 90°, 90°, 90°]$).
+
+El eje Z (motor paso a paso controlado por Arduino vía AccelStepper) permite movimiento relativo en mm publicando en \topic{/z\_axis/move}. Posición actual disponible en \topic{/z\_axis/position}.
+
+La detección de bloques por color (rojo/azul/verde, cubos de 15\,cm) se realiza en el PC externo usando segmentación HSV sobre la imagen cenital; los resultados (posición, color, estado) se publican en \topic{/vision/detections} (JSON).
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Procedimientos de Seguridad}
+
+\begin{itemize}
+  \item \textbf{Parada de emergencia:} \texttt{Ctrl+C} en el launch detiene todos los nodos y envía la señal \texttt{stop} al brazo antes de cerrar el serial.
+  \item \textbf{Límite de velocidad:} la salida PWM de los motores se limita a $[-1.0, 1.0]$ en el PID para evitar sobrecorriente.
+  \item \textbf{Detención por llegada:} el controlador se detiene cuando $e_s < 5\,\text{cm}$.
+  \item \textbf{Gálibo y puente:} el sistema de visión debe marcar como celdas no transitables todas las regiones del mapa que excedan la altura del gálibo (30\,cm) cuando no corresponda atravesarlo.
+  \item \textbf{Condición insegura:} si se detecta pérdida de comunicación serial o falla del BNO055, el nodo correspondiente emite \texttt{WARN} pero no detiene el sistema; el EKF puede continuar solo con odometría.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Limitaciones Conocidas}
+
+\begin{itemize}
+  \item La deriva de odometría se incrementa en superficies irregulares; la corrección cenital es esencial para misiones largas.
+  \item La cámara del robot (Pi Camera) no está utilizada directamente para navegación, solo para el streaming al PC externo.
+  \item El nodo \texttt{motor\_command} (\topic{/motor\_cmd}) y \texttt{motor\_control} (GPIO directo) no deben ejecutarse simultáneamente (conflicto de pines GPIO).
+\end{itemize}
+
+\end{multicols}
+
+\end{document}

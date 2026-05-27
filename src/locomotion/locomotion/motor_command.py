@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-import os
-os.environ["GPIOZERO_PIN_FACTORY"] = "lgpio"
-
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from gpiozero import Motor
+from gpiozero.pins.lgpio import LGPIOFactory
+from gpiozero import Device
+Device.pin_factory = LGPIOFactory(chip=4)
 
 
 # =========================

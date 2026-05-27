@@ -12,7 +12,7 @@ from gpiozero.pins.lgpio import LGPIOFactory
 from gpiozero import Device, RotaryEncoder
 
 from sensors.odometry import RecorderPlayer
-Device.pin_factory = LGPIOFactory(chip=0)
+Device.pin_factory = LGPIOFactory(chip=4)
 
 import rclpy
 from rclpy.node import Node

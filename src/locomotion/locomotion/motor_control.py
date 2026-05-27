@@ -8,8 +8,9 @@ from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 
-import os
-os.environ["GPIOZERO_PIN_FACTORY"] = "lgpio"
+from gpiozero.pins.lgpio import LGPIOFactory
+from gpiozero import Device
+Device.pin_factory = LGPIOFactory(chip=4)
 
 import rclpy
 from rclpy.node import Node

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypename="package"?>
+<package format="3">
+  <name>proyecto_final_grupo5</name>
+  <version>1.0.0</version>
+  <description>
+    Proyecto Final IELE3338L — Robot autónomo para mapeo, navegación y manipulación
+    en pista logística. Grupo 5, Universidad de los Andes, 2026-10.
+  </description>
+  <maintainer email="j.carreral@uniandes.edu.co">Grupo 5</maintainer>
+  <license>Apache-2.0</license>
+
+  <depend>sensors</depend>
+  <depend>locomotion</depend>
+  <depend>my_robot_description</depend>
+  <depend>nav2_config</depend>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
