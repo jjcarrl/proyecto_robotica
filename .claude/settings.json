@@ -13,7 +13,8 @@
       "Bash(awk '{print $2}')",
       "Bash(nm -D /opt/ros/jazzy/lib/libfastcdr.so.2)",
       "Bash(apt-cache policy *)",
-      "Bash(ping -c 2 192.168.1.19)"
+      "Bash(ping -c 2 192.168.1.19)",
+      "Bash(colcon build *)"
     ],
     "additionalDirectories": [
       "/home/robotica"

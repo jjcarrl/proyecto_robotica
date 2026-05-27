@@ -22,7 +22,7 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, Opaq
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-from ament_index_python.packages import PackageNotFoundError
+
 
 
 def generate_launch_description():
@@ -60,26 +60,21 @@ def generate_launch_description():
     )
 
     # ── 2. rf2o lidar odometry (/scan → /odom_rf2o) ───────────────────────────
-    try:
-        get_package_share_directory('rf2o_laser_odometry')
-        rf2o_node = Node(
-            package='rf2o_laser_odometry',
-            executable='rf2o_laser_odometry_node',
-            name='rf2o_laser_odometry',
-            output='screen',
-            parameters=[{
-                'laser_scan_topic': '/scan',
-                'odom_topic':       '/odom_rf2o',
-                'publish_tf':       False,
-                'base_frame_id':    'base_link',
-                'odom_frame_id':    'odom',
-                'freq':             10.0,
-            }],
-        )
-    except PackageNotFoundError:
-        import logging
-        logging.getLogger('launch').warning('rf2o_laser_odometry not found — skipping lidar odometry')
-        rf2o_node = None
+    rf2o_node = Node(
+        package='rf2o_laser_odometry',
+        executable='rf2o_laser_odometry_node',
+        name='rf2o_laser_odometry',
+        output='screen',
+        parameters=[{
+            'laser_scan_topic':     '/scan',
+            'odom_topic':           '/odom_rf2o',
+            'publish_tf':           False,
+            'base_frame_id':        'base_link',
+            'odom_frame_id':        'odom',
+            'freq':                 10.0,
+            'init_pose_from_topic': '',
+        }],
+    )
 
     # ── 3. EKF ────────────────────────────────────────────────────────────────
     ekf_node = Node(

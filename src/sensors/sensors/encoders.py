@@ -34,7 +34,7 @@ PIN_ENC_R_B = 24
 # =========================
 # Parámetros del robot
 # =========================
-ENCODER_PPR  = 562
+ENCODER_PPR  = 637
 WHEEL_DIAM_M = 0.08
 WHEEL_BASE   = 0.20
 DIST_PER_TICK = (math.pi * WHEEL_DIAM_M) / ENCODER_PPR
@@ -133,13 +133,13 @@ class EncodersNode(Node):
         odom.twist.twist.angular.z = self.omega       # d_yaw / dt
 
         # Covariances
-        odom.pose.covariance[0]  = 0.002
-        odom.pose.covariance[7]  = 0.026
-        odom.pose.covariance[35] = 0.05
+        odom.pose.covariance[0]  = 0.05
+        odom.pose.covariance[7]  = 0.05
+        odom.pose.covariance[35] = 0.1
 
-        odom.twist.covariance[0]  = 0.002
-        odom.twist.covariance[7]  = 0.026
-        odom.twist.covariance[35] = 0.05
+        odom.twist.covariance[0]  = 0.05
+        odom.twist.covariance[7]  = 0.05
+        odom.twist.covariance[35] = 0.1
 
 
         self.odom_pub_.publish(odom)
