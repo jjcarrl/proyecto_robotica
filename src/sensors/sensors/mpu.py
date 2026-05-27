@@ -3,7 +3,7 @@ import math
 import struct
 import time
 
-from smbus2 import SMBus, i2c_msg
+from smbus2 import SMBus
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Imu
@@ -47,13 +47,10 @@ class _BNO055:
     # ── I2C raw ───────────────────────────────────────────────────────────────
 
     def _read(self, reg: int, n: int) -> bytes:
-        w = i2c_msg.write(self._addr, [reg])
-        r = i2c_msg.read(self._addr, n)
-        self._bus.i2c_rdwr(w, r)
-        return bytes(r)
+        return bytes(self._bus.read_byte_data(self._addr, reg + i) for i in range(n))
 
     def _write(self, reg: int, val: int):
-        self._bus.i2c_rdwr(i2c_msg.write(self._addr, [reg, val]))
+        self._bus.write_byte_data(self._addr, reg, val)
 
     # ── inicialización ────────────────────────────────────────────────────────
 
@@ -177,16 +174,15 @@ class MPUNode(Node):
 
     @staticmethod
     def _detect_addr(bus: SMBus) -> int:
-        for addr in (0x28, 0x29):
-            try:
-                w = i2c_msg.write(addr, [0x00])
-                r = i2c_msg.read(addr, 1)
-                bus.i2c_rdwr(w, r)
-                if list(r)[0] == 0xA0:
-                    return addr
-            except OSError:
-                pass
-        raise RuntimeError('BNO055 no detectado en 0x28 ni 0x29')
+        for attempt in range(10):
+            for addr in (0x28, 0x29):
+                try:
+                    if bus.read_byte_data(addr, 0x00) == 0xA0:
+                        return addr
+                except OSError:
+                    pass
+            time.sleep(0.5)
+        raise RuntimeError('BNO055 no detectado en 0x28 ni 0x29 tras 10 intentos')
 
     def _log_cal(self):
         now = self.get_clock().now().nanoseconds

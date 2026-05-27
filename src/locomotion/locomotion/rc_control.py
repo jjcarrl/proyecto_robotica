@@ -2,7 +2,16 @@
 import rclpy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Float32, Bool
 from rclpy.node import Node
+
+# PS5 DualSense button indices (ros2 joy)
+BTN_X  = 0   # X (Cruz) → toggle servo
+BTN_L1 = 4   # L1       → bajar motor de pasos (elevador)
+BTN_R1 = 5   # R1       → subir motor de pasos (elevador)
+
+STEPPER_STEP_MM = 5.0   # mm por pulsación de L1/R1
+
 
 class rc_control_node(Node):
     def __init__(self):
@@ -10,40 +19,65 @@ class rc_control_node(Node):
         self.gamepad_capture_ = self.create_subscription(
             Joy, "/joy", self.gamepad_callback, 10
         )
-        self.motor_pub_ = self.create_publisher(
-            Twist, "/motor_cmd", 10
-        )
-        self.latest_joy_ = None  # ← None until first message arrives
+        self.motor_pub_   = self.create_publisher(Twist,   "/motor_cmd",   10)
+        self.stepper_pub_ = self.create_publisher(Float32, "/z_axis/move", 10)
+        self.servo_pub_   = self.create_publisher(Bool,    "/servo/cmd",   10)
+
+        self.latest_joy_  = None
+        self._prev_btns   = []
+        self._servo_state = False   # False=0°, True=90°
+
         self.timer_ = self.create_timer(0.02, self.main_loop)
 
     def gamepad_callback(self, msg: Joy):
         self.latest_joy_ = msg
 
     def linear_remap(self, value, a=-1.0, b=1.0, c=0.0, d=1.0):
-        return (d - c) * (value - a) / (b - a) + c  # ← corrected formula
+        return (d - c) * (value - a) / (b - a) + c
+
+    def _btn_pressed(self, idx: int, btns: list) -> bool:
+        """True solo en el flanco de subida del botón."""
+        cur  = len(btns) > idx and bool(btns[idx])
+        prev = len(self._prev_btns) > idx and bool(self._prev_btns[idx])
+        return cur and not prev
 
     def main_loop(self):
-        # Guard: skip until at least one Joy message has been received
         if self.latest_joy_ is None or len(self.latest_joy_.axes) < 6:
             return
 
-        # Speed magnitude
+        btns = list(self.latest_joy_.buttons)
+
+        # ── Motor de pasos (eje Z) ────────────────────────────────────────────
+        if self._btn_pressed(BTN_R1, btns):
+            msg = Float32(); msg.data = +STEPPER_STEP_MM
+            self.stepper_pub_.publish(msg)
+            self.get_logger().info(f'Z +{STEPPER_STEP_MM} mm')
+
+        if self._btn_pressed(BTN_L1, btns):
+            msg = Float32(); msg.data = -STEPPER_STEP_MM
+            self.stepper_pub_.publish(msg)
+            self.get_logger().info(f'Z -{STEPPER_STEP_MM} mm')
+
+        # ── Servo ─────────────────────────────────────────────────────────────
+        if self._btn_pressed(BTN_X, btns):
+            self._servo_state = not self._servo_state
+            msg = Bool(); msg.data = self._servo_state
+            self.servo_pub_.publish(msg)
+            self.get_logger().info(f'Servo → {90 if self._servo_state else 0}°')
+
+        self._prev_btns = btns
+
+        # ── Movimiento ────────────────────────────────────────────────────────
         speed = 0.0
-        forward = self.linear_remap(self.latest_joy_.axes[5], a=1, b=-1, c=0, d=5)
-        speed += forward
-
-        backward = self.linear_remap(self.latest_joy_.axes[2], a=1, b=-1, c=0, d=5)
-        speed -= backward
-
-        # Angle
-        angle = self.linear_remap(self.latest_joy_.axes[0], a=-1, b=1, c=-3, d=3)
+        speed += self.linear_remap(self.latest_joy_.axes[5], a=1, b=-1, c=0, d=5)
+        speed -= self.linear_remap(self.latest_joy_.axes[2], a=1, b=-1, c=0, d=5)
+        angle  = self.linear_remap(self.latest_joy_.axes[0], a=-1, b=1, c=-3, d=3)
 
         vel_msg = Twist()
         vel_msg.angular.z = angle
-        vel_msg.linear.x = speed
+        vel_msg.linear.x  = speed
         self.motor_pub_.publish(vel_msg)
 
-        #print(f"input: {list(self.latest_joy_.axes)} | speed: {speed:.2f} | angle: {angle:.2f}")
 
 def main(args=None):
     rclpy.init(args=args)
